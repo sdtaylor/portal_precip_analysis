@@ -1,5 +1,6 @@
-install.packages(c('tidyverse','devtools'))
-devtools::install_github('weecology/portalr')
+#Uncomment these two lines to install the required packages
+#install.packages(c('tidyverse','devtools'))
+#devtools::install_github('weecology/portalr')
 library(portalr)
 library(tidyverse)
 
