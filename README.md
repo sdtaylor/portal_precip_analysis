@@ -11,7 +11,7 @@ growth, how long before a rodent species sees the benefits of that rain?
 
 Specifically I will use a linear model with the monthly species abundance as the dependent
 variable and the total precipitation from each of the prior 6 months as the independent
-variables. Then I will use stepwise model selection with AIC to select the months
-which best explain rodent abundance.
+variables. The strength and sign of the coefficients for each month will show it's contribution
+to rodent abundance.
 
 The analysis script is separated into various data cleaning and organizing steps and analysis steps.

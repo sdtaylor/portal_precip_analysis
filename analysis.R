@@ -149,8 +149,8 @@ period_counts = period_counts %>%
 #####################################################################
 #####################################################################
 
-# For each species, run an AIC selection model to select the months which
-# best explain the species abundance
+# For each species, run an linear model to find out which months in the past
+# contribute the most to rodent abundance
 
 #Create some empty data.frames which will hold the final results
 model_info = data.frame()
@@ -164,15 +164,7 @@ for(this_species in unique(period_counts$species)){
   species_model = lm(num_rodents ~ months_prior_1 + months_prior_2 + months_prior_3 + months_prior_4 + months_prior_5 + months_prior_6,
              data=this_species_data)
   
-  #Run in thru an AIC selection process to choose the months with the best correlations
-  species_model = try(step(species_model, direction = 'both'))
-  
-  #If the model selection produced some error, then just skip this species
-  if(class(species_model) == 'try-error'){
-    next
-  }
-  
-  #The broom packages summarize the AIC optimized model into a dataframe
+  #The broom packages summarize the model results into a dataframe
   #
   #broom::tidy() returns info about each coefficient, 1 per row
   species_coef_info = broom::tidy(species_model)
@@ -192,3 +184,8 @@ for(this_species in unique(period_counts$species)){
 ####################################################################################
 ####################################################################################
 #
+
+
+num_coefs = coef_info %>%
+  group_by(species) %>%
+  tally()
