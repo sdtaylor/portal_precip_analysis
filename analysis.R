@@ -104,47 +104,59 @@ get_prior_months_precip = function(num_months=6, period){
 }
 ################################################################
 ################################################################
-#Use a for loop to iterate over each period and retrieve the precipitation
-#record of the prior 6 months using the above function
+# Use a for loop to iterate over each period and retrieve the precipitation
+# record of the prior 6 months using the above function
 
 num_prior_months = 6
 
-#Create an empty data.frame to hold this
+# Create an empty data.frame to hold this
 prior_precip_values = data.frame()
 
 for(this_period in unique(period_counts$period)){
-  #Skip the first 30 or so periods where weather wasn't recorded
+  # Skip the first 30 or so periods where weather wasn't recorded
   if(this_period < 40){
     next
   }
   
-  #Get this periods prior precip, and use spread to put each row into a column
+  # Get this periods prior precip, and use spread to put each row into a column
   this_period_prior_precip = get_prior_months_precip(num_months = num_prior_months, period = this_period) %>%
     spread(months_prior, precipitation)
   
   this_period_prior_precip$period = this_period
   
-  #Add this periods data to the data.frame with all the periods
+  # Add this periods data to the data.frame with all the periods
   prior_precip_values = prior_precip_values %>%
     bind_rows(this_period_prior_precip)
   
 }
 
 ###################################################################
-#Add the information about the past 6 months precip into the monthly rodent count data
-#Drop any rows where prior precip is missing from it not being recorded
+###################################################################
+# Add the information about the past 6 months precip into the monthly rodent count data
+# Drop any rows where prior precip is missing from it not being recorded
 
 period_counts = period_counts %>%
   left_join(prior_precip_values, by=c('period')) %>%
   filter(complete.cases(.))
 
 
-#####################################################################
-#For each unique species an AIC model for the 6 m
 
+#####################################################################
+#####################################################################
+# The data is now cleaned and ready to be put directly into a model
+# using the period_counts data.frame
+
+#####################################################################
+#####################################################################
+
+# For each species, run an AIC selection model to select the months which
+# best explain the species abundance
+
+#Create some empty data.frames which will hold the final results
 model_info = data.frame()
 coef_info = data.frame()
 
+#Loop thru each species, adding results from models as we go
 for(this_species in unique(period_counts$species)){
   this_species_data = period_counts %>%
     filter(species == this_species)
@@ -161,6 +173,7 @@ for(this_species in unique(period_counts$species)){
   }
   
   #The broom packages summarize the AIC optimized model into a dataframe
+  #
   #broom::tidy() returns info about each coefficient, 1 per row
   species_coef_info = broom::tidy(species_model)
   #broom::glance() returns info about the entire  model, such as AIC, r^2, p.values, etc.
@@ -175,7 +188,6 @@ for(this_species in unique(period_counts$species)){
     bind_rows(species_coef_info)
   
 }
-
 
 ####################################################################################
 ####################################################################################
