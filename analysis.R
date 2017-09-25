@@ -183,9 +183,28 @@ for(this_species in unique(period_counts$species)){
 
 ####################################################################################
 ####################################################################################
-#
+#Some summary graphs. 
+
+# First take out the intercept term from the models, which isn't relevant for our current
+# analysis.
+coef_info = coef_info %>%
+  filter(term != '(Intercept)')
 
 
-num_coefs = coef_info %>%
-  group_by(species) %>%
-  tally()
+# For each species show the coefficient values for each month in the past
+ggplot(coef_info, aes(x=term, y=estimate)) + 
+  geom_bar(stat = 'identity') + 
+  geom_errorbar(aes(ymin = estimate - std.error, ymax = estimate + std.error)) +
+  geom_hline(yintercept = 0, color='red') +
+  facet_wrap(~species, scales='free') + 
+  theme(axis.text.x = element_text(size = 7, angle=80, hjust = 1))
+
+
+# Many of the coefficients have their standard error estimates around 0, which means
+# they aren't significant. Some are significant though. For example the species DO
+# looks to be negatively correlated with the prior months precip, and OL positively 
+# correlated with prior months 2-6. 
+# 
+# Some graphs have incomplete data. Such as the species OX, PX, and SX. Can you figure out why?
+# 
+# How else could the modeling aspect of this be improved?
