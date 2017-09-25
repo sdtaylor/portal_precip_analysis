@@ -3,23 +3,6 @@ devtools::install_github('weecology/portalr')
 library(portalr)
 library(tidyverse)
 
-# At what time lag are desert rodent species influence by precipitation?
-# 
-# In this script Ill be doing an analysis inspired by Thibault et al. 2010
-# which uses this same data
-# 
-# For ~20 rodent species, I will calculate the correlation between different time
-# lags of precipitation. For example, if it rains in March, producing annual plant 
-# growth, how long before a rodent species sees the benefits of that rain?
-# 
-# Specifically I will use a linear model with the monthely species abundance as the dependent
-# variable and the total precipitation from each of the prior 6 months as the independent
-# variables. Then I will use stepwise model selection with AIC to select the months
-# which best explain rodent abundance.
-# 
-# This script is separted into various data cleaning and organizing steps and analysis steps. 
-
-
 
 ########################################################################
 ########################################################################
