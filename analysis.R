@@ -31,12 +31,12 @@ species_info = read.csv('PortalData/Rodents/Portal_rodent_species.csv')
 trapping_info = read.csv('PortalData/Rodents/Portal_rodent_trapping.csv')
 
 
-#Filter out periods with sampling issues (those with negative period number),
-#undefined species names, and non-rodent species
+# Filter out periods with sampling issues (those with negative period number),
+# undefined species names, and non-rodent species. 
 rodent_data = rodent_data %>%
   filter(period>0, !is.na(species), species!='')
 
-#Filter out non-rodent species by combining info from the species table
+# Filter out non-rodent species by combining info from the species table
 rodent_data = rodent_data %>%
   left_join(species_info, by=c('species'='speciescode')) %>%
   filter(rodent==1)
@@ -72,7 +72,8 @@ weather_data = portalr::weather(level = 'Monthly', path='.')
 #by a join using the month and year.
 period_months = trapping_info %>%
   group_by(period) %>%
-  summarize(month = min(month), year=min(year))
+  summarize(month = min(month), year=min(year)) %>%
+  ungroup()
 
 weather_data = weather_data %>%
   left_join(period_months, by=c('year','month')) %>%
@@ -80,23 +81,27 @@ weather_data = weather_data %>%
 
 ################################################################
 ################################################################
-#This function will, for a given period  number, extract the  precipitation
-#records from the prior months (default is 6)
+# This function will, for a given period  number, extract the  precipitation
+# records from the prior months (default is 6)
 get_prior_months_precip = function(num_months=6, period){
+  # Within the weather data.frame, find the row that corrosponds to
+  # the given period number. If it ends up being NA (meaning there is
+  # no entry for this period number) then return NA without doing further work
   this_period_row_number = which(weather_data$period==period)
   if(is.na(this_period_row_number) | length(this_period_row_number)!=1 ){
     return(NA)
   }
   
+  # Calculate the prior entries needed 
   starting_value = this_period_row_number - num_months
   ending_value   = this_period_row_number - 1
   prior_precip = weather_data[starting_value:ending_value,]
   
-  #Fill in any missing precip values with the average from this
-  #subset
+  # Fill in any missing precip values with the average from this
+  # subset
   prior_precip$precipitation[is.na(prior_precip$precipitation)] = mean(prior_precip$precipitation, na.rm=T)
   
-  #Return only the precip data with oen other column of the prior period identifier
+  # Return only the precip data with one other column of the prior period identifier
   prior_precip = select(prior_precip, precipitation)
   prior_precip$months_prior = paste0('months_prior_',num_months:1)
   
@@ -138,8 +143,6 @@ for(this_period in unique(period_counts$period)){
 period_counts = period_counts %>%
   left_join(prior_precip_values, by=c('period')) %>%
   filter(complete.cases(.))
-
-
 
 #####################################################################
 #####################################################################
