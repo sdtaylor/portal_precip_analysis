@@ -88,6 +88,20 @@ broom::tidy(model)
 # The glance function cleans up the model summary statistics
 broom::glance(model)
 
+###################################################################
+#for loops
+
+# For loops are used to repeat the same task over and over with minor variations
+sample_sizes = c(50, 200, 500)
+
+# This for loop will, for each entry in the sample_size vector, get dataframe of
+# npp values, build a linear model, and print the p.value of the model
+for(sample_size in sample_sizes){
+  npp_data = get_random_npp_data(num_samples = sample_size)
+  model = lm(npp~precip, data=npp_data)
+  
+  print(broom::glance(model)$p.value)
+}
 
 
 ###################################################################
