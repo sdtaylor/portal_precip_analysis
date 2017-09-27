@@ -81,7 +81,7 @@ model = lm(npp ~ precip, data=npp_data)
 # The summary of the model provides output for interpretation
 summary(model)
 # But what if we want to save this output, and many other models, for comparison?
-# Use  the broom package
+# Use  the broom package to  convert model output into a data.frame of results
 
 # The tidy function cleans up model details into it's various parts
 broom::tidy(model)
